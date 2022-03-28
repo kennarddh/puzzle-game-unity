@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PuzzlePiece
 {
-    public static int CurrentRow { get; set; }
-    public static int CurrentColumn { get; set; }
+    public int CurrentRow { get; set; }
+    public int CurrentColumn { get; set; }
 
-    public static int OriginalRow { get; set; }
-    public static int OriginalColumn { get; set; }
+    public int OriginalRow { get; set; }
+    public int OriginalColumn { get; set; }
 
-    public static GameObject GameObject { get; set; }
+    public GameObject GameObject { get; set; }
 }
