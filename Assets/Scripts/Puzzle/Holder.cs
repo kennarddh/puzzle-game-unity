@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Holder : MonoBehaviour
 {
-    public GameObject[] PuzzlePieces;
+    public GameObject[] puzzlePieces;
 }

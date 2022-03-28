@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Piece
+public class PuzzlePiece
 {
     public static int CurrentRow { get; set; }
     public static int CurrentColumn { get; set; }
