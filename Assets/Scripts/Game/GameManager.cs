@@ -59,8 +59,8 @@ public class GameManager : MonoBehaviour
     private void GameStarted()
     {
         int index = Random.Range(0, GameVariables.MaxSize);
-/*
-        puzzlePieces[index].SetActive(false)*/;
+
+        puzzlePieces[index].SetActive(false);
 
         for (int row = 0; row < GameVariables.MaxRows; row++)
         {
