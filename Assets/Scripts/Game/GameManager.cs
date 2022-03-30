@@ -83,6 +83,55 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        Shuffle();
+        
+        gameState = GameState.Playing;
+    }
+
+    private void Shuffle()
+    {
+        for (int row = 0; row < GameVariables.MaxRows; row++)
+        {
+            for (int column = 0; column < GameVariables.MaxColumns; column++)
+            {
+                if (Matrix[row, column] == null) continue;
+
+                int randomRow = Random.Range(0, GameVariables.MaxRows);
+                int randomColumn = Random.Range(0, GameVariables.MaxColumns);
+
+                Swap(row, column, randomRow, randomColumn);
+            }
+        }
+    }
+    
+    private void Swap(int row, int column, int randomRow, int randomColumn)
+    {
+        PuzzlePiece temp = Matrix[row, column];
+        
+        (
+            Matrix[row, column],
+            Matrix[randomRow, randomColumn]
+        ) = (
+            Matrix[randomRow, randomColumn],
+            Matrix[row, column]
+        );
+
+        Matrix[randomRow, randomColumn] = temp;
+
+        if (Matrix[row, column] != null)
+        {
+            Matrix[row, column].GameObject.transform.position = GetScreenCoordinateFromViewPort(row, column);
+
+            Matrix[row, column].CurrentRow = row;
+            Matrix[row, column].CurrentColumn = column;
+        }
+
+        Matrix[randomRow, randomColumn].GameObject.transform.position = GetScreenCoordinateFromViewPort(randomRow, randomColumn);
+
+        Matrix[randomRow, randomColumn].CurrentRow = randomRow;
+        Matrix[randomRow, randomColumn].CurrentColumn = randomColumn;
+        
     }
 
     private Vector3 GetScreenCoordinateFromViewPort(int row, int column)
