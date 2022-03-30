@@ -134,6 +134,90 @@ public class GameManager : MonoBehaviour
         
     }
 
+    private void CheckInput()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            
+            if (hit.collider != null)
+            {
+                string[] parts = hit.collider.name.Split('-');
+
+                int columnPart = int.Parse(parts[1]);
+                int rowPart = int.Parse(parts[2]);
+
+                int columnFound = -1;
+                int rowFound = -1;
+                
+                for (int row = 0; row < GameVariables.MaxRows; row++)
+                {
+                    if (rowFound != -1) break;
+                    
+                    for (int column = 0; column < GameVariables.MaxColumns; column++)
+                    {
+                        if (rowFound != -1) break;
+
+                        if (Matrix[row, column] == null) continue;
+
+                        if (Matrix[row, column].OriginalRow == rowPart && Matrix[row, column].OriginalColumn == columnPart)
+                        {
+                            rowFound = row;
+
+                            columnFound = column;
+                        }
+                    }
+                }
+
+                bool pieceFound = false;
+
+                if (rowFound > 0 && Matrix[rowFound - 1, columnFound] == null)
+                {
+                    pieceFound = true;
+
+                    toAnimateRow = rowFound - 1;
+
+                    toAnimateColumn = columnFound;
+                }
+                else if (columnFound > 0 && Matrix[rowFound, columnFound - 1] == null)
+                {
+                    pieceFound = true;
+
+                    toAnimateRow = rowFound;
+
+                    toAnimateColumn = columnFound - 1;
+                }
+                else if (rowFound < GameVariables.MaxRows - 1 && Matrix[rowFound + 1, columnFound] == null)
+                {
+                    pieceFound = true;
+
+                    toAnimateRow = rowFound + 1;
+
+                    toAnimateColumn = columnFound;
+                }
+                else if (columnFound < GameVariables.MaxColumns - 1 && Matrix[rowFound, columnFound + 1] == null)
+                {
+                    pieceFound = true;
+
+                    toAnimateRow = rowFound;
+
+                    toAnimateColumn = columnFound + 1;
+                }
+
+                if (pieceFound)
+                {
+                    screenPositionToAnimate = GetScreenCoordinateFromViewPort(toAnimateRow, toAnimateColumn);
+
+                    pieceToAnimate = Matrix[rowFound, columnFound];
+
+                    gameState = GameState.Animating;
+                }
+            }
+        }
+    }
+    
     private Vector3 GetScreenCoordinateFromViewPort(int row, int column)
     {
         Vector3 point = Camera.main.ViewportToWorldPoint(new Vector3(0.2309f * row, 1 - 0.233f * column, 0));
