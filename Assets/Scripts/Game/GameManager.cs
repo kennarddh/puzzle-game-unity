@@ -34,7 +34,25 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        
+        if (SceneManager.GetActiveScene().name == "Gameplay")
+        {
+            switch (gameState)
+            {
+                case GameState.Playing:
+                    CheckInput();
+                    
+                    break;
+                case GameState.Animating:
+                    AnimateMovement(pieceToAnimate, Time.deltaTime);
+
+                    CheckIfAnimationEnded();
+
+                    break;
+                case GameState.End:
+                    print("Game Ended");
+                    break;
+            }
+        }
     }
 
     void OnEnable()
@@ -53,6 +71,15 @@ public class GameManager : MonoBehaviour
         {
             LoadPuzzle();
             GameStarted();
+        }
+
+        if (scene.name != "Gameplay")
+        {
+            puzzleIndex = -1;
+
+            puzzlePieces = null;
+
+            gameState = GameState.End;
         }
     }
     
@@ -78,7 +105,9 @@ public class GameManager : MonoBehaviour
 
                     Matrix[row, column].OriginalRow = row;
                     Matrix[row, column].OriginalColumn = column;
-                } else {
+                }
+                else
+                {
                     Matrix[row, column] = null;
                 }
             }
@@ -146,11 +175,11 @@ public class GameManager : MonoBehaviour
             {
                 string[] parts = hit.collider.name.Split('-');
 
-                int columnPart = int.Parse(parts[1]);
-                int rowPart = int.Parse(parts[2]);
+                int rowPart = int.Parse(parts[1]);
+                int columnPart = int.Parse(parts[2]);
 
-                int columnFound = -1;
                 int rowFound = -1;
+                int columnFound = -1;
                 
                 for (int row = 0; row < GameVariables.MaxRows; row++)
                 {
@@ -217,7 +246,49 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    
+
+    private void AnimateMovement(PuzzlePiece toMove, float time)
+    {
+        toMove.GameObject.transform.position = Vector2.MoveTowards(
+            toMove.GameObject.transform.position,
+            screenPositionToAnimate,
+            animationSpeed * time
+        );
+    }
+
+    private void CheckIfAnimationEnded()
+    {
+        if (Vector2.Distance(
+            pieceToAnimate.GameObject.transform.position,
+            screenPositionToAnimate
+        ) < 0.1f)
+        {
+            Swap(pieceToAnimate.CurrentRow, pieceToAnimate.CurrentColumn, toAnimateRow, toAnimateColumn);
+
+            gameState = GameState.Playing;
+
+            CheckForVictory();
+        }
+    }
+
+    private void CheckForVictory()
+    {
+        for (int row = 0; row < GameVariables.MaxRows; row++)
+        {
+            for (int column = 0; column < GameVariables.MaxColumns; column++)
+            {
+                if (Matrix[row, column] == null) continue;
+
+                if (
+                    Matrix[row, column].CurrentRow != Matrix[row, column].OriginalRow ||
+                    Matrix[row, column].CurrentColumn != Matrix[row, column].OriginalColumn
+                ) return;
+            }
+        }
+
+        gameState = GameState.End;
+    }
+
     private Vector3 GetScreenCoordinateFromViewPort(int row, int column)
     {
         Vector3 point = Camera.main.ViewportToWorldPoint(new Vector3(0.2309f * row, 1 - 0.233f * column, 0));
